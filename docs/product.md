@@ -1,3 +1,5 @@
+相关文档：`product-brainstorm.md`（产品）· `mvp.md`（MVP）· `ops.md`（运营）· `tech.md`（技术选型）
+
 背词
 1. 用户
     1. 国内用户
