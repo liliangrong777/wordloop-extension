@@ -12,9 +12,12 @@ type DictionaryEntry = {
 
 export async function lookupWord(raw: string): Promise<LookupResult> {
   const word = normalizeWord(raw);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 2500);
   try {
     const response = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
+      { signal: controller.signal },
     );
     if (!response.ok) return { definition: "" };
 
@@ -30,5 +33,7 @@ export async function lookupWord(raw: string): Promise<LookupResult> {
     return { definition, phonetic, audioUrl };
   } catch {
     return { definition: "" };
+  } finally {
+    clearTimeout(timer);
   }
 }

@@ -1,5 +1,5 @@
-import type { LookupResult, SavedWord } from "@/utils/types";
-import { isCollectableWord, normalizeWord } from "@/utils/word";
+import type { SavedWord } from "@/utils/types";
+import { isCollectableWord } from "@/utils/word";
 import { highlightWords } from "./highlight";
 import { isSkippedNode, sentenceFromSelection } from "./skip";
 import "./style.css";
@@ -9,16 +9,21 @@ export default defineContentScript({
   runAt: "document_idle",
   cssInjectionMode: "manifest",
   async main() {
-    let words: SavedWord[] = await browser.runtime.sendMessage({ type: "GET_WORDS" });
+    let words: SavedWord[] = [];
     let hideTimer = 0;
     let askedReview = false;
+    let collecting = false;
     let collectEl: HTMLButtonElement | null = null;
     let cardEl: HTMLDivElement | null = null;
     let reviewEl: HTMLDivElement | null = null;
     const pageKey = location.origin + location.pathname;
 
-    const settings = await browser.runtime.sendMessage({ type: "GET_SETTINGS" });
+    const settings =
+      (await browser.runtime.sendMessage({ type: "GET_SETTINGS" }).catch(() => ({}))) ??
+      {};
     let highlightOff = Boolean(settings.pageHighlightDisabled?.[pageKey]);
+    words = ((await browser.runtime.sendMessage({ type: "GET_WORDS" }).catch(() => [])) ??
+      []) as SavedWord[];
 
     const refresh = () => {
       if (highlightOff) {
@@ -71,44 +76,62 @@ export default defineContentScript({
     observer.observe(document.body, { childList: true, subtree: true });
 
     function showCollectButton() {
+      if (collecting) return;
       collectEl?.remove();
       collectEl = null;
       const selection = window.getSelection();
       const text = selection?.toString().trim() ?? "";
-      if (!selection || !isCollectableWord(text)) return;
+      if (!selection || selection.rangeCount === 0 || !isCollectableWord(text)) return;
       if (selection.anchorNode && isSkippedNode(selection.anchorNode)) return;
 
       const range = selection.getRangeAt(0).getBoundingClientRect();
+      const sentence = sentenceFromSelection(selection);
       const button = document.createElement("button");
+      button.type = "button";
       button.className = "wordloop-ui wordloop-collect";
       button.textContent = "收藏";
-      button.style.left = `${Math.max(8, range.left + window.scrollX)}px`;
-      button.style.top = `${range.bottom + window.scrollY + 8}px`;
-      button.addEventListener("mousedown", (event) => event.preventDefault());
-      button.addEventListener("click", () => void collect(text, selection));
+      button.style.left = `${Math.max(8, range.left)}px`;
+      button.style.top = `${Math.min(window.innerHeight - 48, range.bottom + 8)}px`;
+      button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        void collect(text, sentence, button);
+      });
       document.documentElement.append(button);
       collectEl = button;
     }
 
-    async function collect(raw: string, selection: Selection) {
-      collectEl?.remove();
-      const lookup = (await browser.runtime.sendMessage({
-        type: "LOOKUP_WORD",
-        word: raw,
-      })) as LookupResult;
-      await browser.runtime.sendMessage({
-        type: "SAVE_WORD",
-        payload: {
-          word: raw,
-          definition: lookup.definition,
-          phonetic: lookup.phonetic,
-          audioUrl: lookup.audioUrl,
-          sourceUrl: location.href,
-          sourceTitle: document.title,
-          sentence: sentenceFromSelection(selection),
-        },
-      });
-      window.getSelection()?.removeAllRanges();
+    async function collect(raw: string, sentence: string, button: HTMLButtonElement) {
+      collecting = true;
+      button.textContent = "收藏中…";
+      button.disabled = true;
+      try {
+        const saved = (await browser.runtime.sendMessage({
+          type: "SAVE_WORD",
+          payload: {
+            word: raw,
+            sourceUrl: location.href,
+            sourceTitle: document.title,
+            sentence,
+          },
+        })) as SavedWord;
+        const next = words.filter((item) => item.id !== saved.id);
+        words = [saved, ...next];
+        refresh();
+        window.getSelection()?.removeAllRanges();
+        button.textContent = "已收藏";
+        window.setTimeout(() => {
+          if (collectEl === button) {
+            button.remove();
+            collectEl = null;
+          }
+        }, 700);
+      } catch {
+        button.textContent = "收藏失败";
+        button.disabled = false;
+      } finally {
+        collecting = false;
+      }
     }
 
     function showWordCard(target: HTMLElement) {

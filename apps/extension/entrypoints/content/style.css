@@ -29,7 +29,9 @@
 
 .wordloop-collect {
   cursor: pointer;
+  display: inline-block;
   padding: 6px 10px;
+  pointer-events: auto;
 }
 
 .wordloop-card,

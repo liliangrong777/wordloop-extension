@@ -38,8 +38,11 @@ async function handleMessage(message: { type?: string; [key: string]: unknown })
   switch (message.type) {
     case "LOOKUP_WORD":
       return lookupWord(String(message.word ?? ""));
-    case "SAVE_WORD":
-      return saveWord(message.payload as SaveWordInput);
+    case "SAVE_WORD": {
+      const saved = await saveWord(message.payload as SaveWordInput);
+      void enrichWord(saved.word);
+      return saved;
+    }
     case "GET_WORDS":
       return getWords();
     case "DELETE_WORD":
@@ -62,6 +65,12 @@ async function handleMessage(message: { type?: string; [key: string]: unknown })
     default:
       return { error: "unknown_message" };
   }
+}
+
+async function enrichWord(word: string) {
+  const lookup = await lookupWord(word);
+  if (!lookup.definition && !lookup.phonetic && !lookup.audioUrl) return;
+  await saveWord({ word, ...lookup });
 }
 
 async function recordHighlightHit(word: string) {
