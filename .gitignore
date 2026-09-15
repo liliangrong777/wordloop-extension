@@ -1,0 +1,8 @@
+node_modules
+.output
+.wxt
+.turbo
+dist
+.next
+*.local
+.DS_Store

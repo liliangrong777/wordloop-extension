@@ -1,0 +1,78 @@
+@import "../content/style.css";
+
+:root {
+  color: #3f2e1c;
+  font-family: "PingFang SC", "Hiragino Sans GB", serif;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, #fff6e4, #f4ead6 46%, #efe2ca);
+  margin: 0;
+}
+
+.page {
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 56px 20px 80px;
+}
+
+.eyebrow {
+  color: #a37832;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+}
+
+h1 {
+  font-size: 36px;
+  line-height: 1.2;
+  margin: 0 0 20px;
+}
+
+ol {
+  color: #5c4630;
+  line-height: 1.7;
+  padding-left: 20px;
+}
+
+.sample {
+  background: #fffaf1;
+  border: 1px solid #e6d4b8;
+  border-radius: 16px;
+  font-size: 20px;
+  line-height: 1.7;
+  margin: 24px 0;
+  padding: 24px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  background: #3f2e1c;
+  border: 0;
+  border-radius: 999px;
+  color: #fffaf1;
+  cursor: pointer;
+  padding: 8px 14px;
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid #d8c4a4;
+  color: #3f2e1c;
+}
+
+.hint,
+.ok {
+  line-height: 1.6;
+}
+
+.ok {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "wordloop",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @wordloop/extension dev",
+    "dev:edge": "pnpm --filter @wordloop/extension dev:edge",
+    "build": "pnpm --filter @wordloop/extension build",
+    "build:edge": "pnpm --filter @wordloop/extension build:edge"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

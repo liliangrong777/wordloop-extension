@@ -1,0 +1,74 @@
+.wordloop-highlight {
+  background: rgba(214, 154, 58, 0.32);
+  border-radius: 2px;
+  box-decoration-break: clone;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 0.08em;
+}
+
+.wordloop-ui {
+  all: initial;
+  box-sizing: border-box;
+  font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+}
+
+.wordloop-collect,
+.wordloop-card,
+.wordloop-review {
+  background: #fffaf1;
+  border: 1px solid #e6d4b8;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(62, 41, 16, 0.12);
+  color: #3f2e1c;
+  font-size: 13px;
+  line-height: 1.45;
+  position: fixed;
+  z-index: 2147483646;
+}
+
+.wordloop-collect {
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.wordloop-card,
+.wordloop-review {
+  max-width: 320px;
+  padding: 12px 14px;
+}
+
+.wordloop-card strong,
+.wordloop-review strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.wordloop-muted {
+  color: #8a7356;
+  font-size: 12px;
+}
+
+.wordloop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.wordloop-actions button {
+  background: #3f2e1c;
+  border: 0;
+  border-radius: 999px;
+  color: #fffaf1;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.wordloop-actions button.secondary {
+  background: transparent;
+  border: 1px solid #d8c4a4;
+  color: #3f2e1c;
+}
